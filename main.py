@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup
@@ -7,7 +8,27 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-@app.get("/api/gymdata")
+@app.get("/api/lut-buffet-data")
+async def get_lutbuffetdata():
+    today = datetime.now().strftime('%Y-%m-%d')
+    base_url = "https://api.fi.poweresta.com/publicmenu/dates/kampusravintolat/lut/?menu=syksy&dates="
+    url = base_url + today
+    response = requests.get(url)
+    data = response.json()
+
+    names = []
+
+    for meal_option in data[0]['data']['mealOptions']:
+        for row in meal_option['rows']:
+            for name in row['names']:
+                if name['language'] == 'en':
+                    names.append(name['name'])
+
+    # return data[0]['data']['mealOptions']
+    return names
+
+
+@app.get("/api/lut-gym-data")
 async def get_gym_data():
     url = 'https://embed.gymplus.fi/v2/light/bold/lutsk'
     response = requests.get(url)
