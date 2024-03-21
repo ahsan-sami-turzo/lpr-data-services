@@ -12,7 +12,7 @@ app = FastAPI()
 async def get_lutbuffetdata():
     today = datetime.now().strftime('%Y-%m-%d')
     base_url = "https://api.fi.poweresta.com/publicmenu/dates/kampusravintolat/lut/?menu=syksy&dates="
-    url = base_url + today
+    url = base_url + today + "&lang=en"
     response = requests.get(url)
     data = response.json()
 
@@ -21,10 +21,9 @@ async def get_lutbuffetdata():
     for meal_option in data[0]['data']['mealOptions']:
         for row in meal_option['rows']:
             for name in row['names']:
-                if name['language'] == 'en':
+                if 'name' in name and name['language'] == 'en':
                     names.append(name['name'])
 
-    # return data[0]['data']['mealOptions']
     return names
 
 
